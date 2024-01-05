@@ -56,6 +56,12 @@ public class ContratSoutraitanceCreationDto {
     @Schema(description = "businessID ", example = "div ...............")
     private Long businessID;
 
+
+    @NotNull(message = "projectManagerID can not be a null or empty")
+    @Schema(description = "projectManagerID ", example = "1 ...............n")
+    private Long projectManagerID;
+
+
     @NotNull(message = "soustraitantID can not be a null or empty")
     @Schema(description = "soustraitantID ", example = "div ...............")
     private Long soustraitantID;

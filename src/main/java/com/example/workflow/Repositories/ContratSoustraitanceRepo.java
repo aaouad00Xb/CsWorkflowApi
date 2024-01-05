@@ -2,6 +2,7 @@ package com.example.workflow.Repositories;
 
 import com.example.workflow.Entities.ContratSousTraitance;
 import com.example.workflow.Entities.Division;
+import com.example.workflow.Entities.User.User;
 import com.example.workflow.Entities.User.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,7 +29,8 @@ public interface ContratSoustraitanceRepo  extends JpaRepository<ContratSousTrai
     List<ContratSousTraitance> findInvalidContratByPoleAilleurValid(@Param("poleID") Long poleID);
 
 
-    List<ContratSousTraitance> findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRole(Division d , UserRole r);
+    List<ContratSousTraitance> findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRoleAndProjectManager(Division d , UserRole r,User uer);
+    List<ContratSousTraitance> findContratSousTraitancesByValidIsFalseAndProjectManagerAndCurrentStep_UserRole(User r, UserRole ole);
     List<ContratSousTraitance> findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRoleIsNot(Division d, UserRole r);
     List<ContratSousTraitance> findContratSousTraitancesByValidIsTrueAndDivision(Division d);
     List<ContratSousTraitance> findContratSousTraitancesByValidIsFalseAndCurrentStep_UserRole(UserRole r);

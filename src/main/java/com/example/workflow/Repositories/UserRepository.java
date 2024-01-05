@@ -18,7 +18,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByRoleAndDivisionDivisionId(UserRole role, Long divisionId);
 
 
+    List<User> findByRoleAndDivision_DivisionId(UserRole role, Long divisionId);
+    List<User> findByRoleAndPole_PoleID(UserRole role, Long poleId);
+
+
     List<User> findByRoleAndPole(UserRole role, Pole p );
+
+    List<User> findByRole(UserRole role);
 
 
 

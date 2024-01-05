@@ -36,6 +36,11 @@ public class UserController {
         return ResponseEntity.status(Integer.parseInt(AccountsConstants.STATUS_200)).body(this.userService.getUsers());
 
     }
+    @GetMapping("/getchefsByDivisionID/{divisionID}")
+    public ResponseEntity<?> getchefsByDivisionID(@PathVariable Long divisionID){
+        return ResponseEntity.status(Integer.parseInt(AccountsConstants.STATUS_200)).body(this.userService.getchefsByDivisionID(divisionID));
+
+    }
 
 
     @PostMapping("/{userId}/update")

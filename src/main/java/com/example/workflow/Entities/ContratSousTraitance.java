@@ -1,5 +1,6 @@
 package com.example.workflow.Entities;
 
+import com.example.workflow.Entities.User.User;
 import com.example.workflow.Enums.TypeContrat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -31,6 +32,10 @@ public class ContratSousTraitance extends  BaseEntity {
     private TypeContrat typeContrat;
 
 
+
+    @JsonIgnoreProperties({ "authorities","password","bio","email","manager","division","pole","confirmed","mailconfirmed","confirmationToken","confirmationToken","isActive","nearDeadLine","deadLines","notifySysuperior","facturePaidDone","newFacutresTovalidate",})
+    @ManyToOne
+    private User projectManager;
 
     @JsonIgnoreProperties({ "sousTraitances"})
     @ManyToOne

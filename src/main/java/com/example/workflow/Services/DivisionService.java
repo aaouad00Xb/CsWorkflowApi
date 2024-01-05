@@ -69,6 +69,13 @@ public class DivisionService implements IDivisionService {
         return ResponseEntity.status(200).body(objectMapper.convertValue(d, DivisionDtoResponse.class));
     }
 
+@Override
+    public Division findInternDivisionById(Long id) {
+        Division d =  divisionRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("division by pole id", "pole-id",""+id));
+        return d;
+    }
+
+
     @Override
     public ResponseEntity<?> createDivision(DivisioncreationDto division) {
         try{

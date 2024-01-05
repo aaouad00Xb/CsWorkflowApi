@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,27 +77,42 @@ public class ContratService implements IcontratService {
             User user = userRepository.findUserByUsername(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
 //            todo
             if (user.getRole() != null) {
-                if (user.getRole()  == UserRole.DIVISION_MANAGER || user.getRole()  == UserRole.PROJECT_MANAGER) {
+                if (user.getRole() == UserRole.DIVISION_MANAGER || user.getRole() == UserRole.PROJECT_MANAGER) {
 
-                    List<ContratSoutraitanceResponseDto> divisionDTOList = contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRole(user.getDivision(),user.getRole()).stream()
+                    Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRoleAndProjectManager(user.getDivision(),user.getRole(),user).stream()
+                            .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
+                            .collect(Collectors.toList()));
+
+                    List<ContratSoutraitanceResponseDto> start = contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndProjectManagerAndCurrentStep_UserRole(user,UserRole.PROJECT_MANAGER).stream()
                             .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
                             .collect(Collectors.toList());
+                    divisionDTOList.addAll(start);
 
+                    List<ContratSoutraitanceResponseDto> mergedContracts = new ArrayList<>(divisionDTOList);
 
-                    return ResponseEntity.status(200).body(divisionDTOList);
+                    return ResponseEntity.status(200).body(mergedContracts);
                 } else if (user.getRole() == UserRole.DP) {
                     // Query contracts by user's role and division for DP role
                     Pole p = user.getPole();
 
-                    List<ContratSoutraitanceResponseDto> divisionDTOList = contratSoustraitanceRepo.findInvalidContratByPole(p.getPoleID()).stream()
+                    Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findInvalidContratByPole(p.getPoleID()).stream()
+                            .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
+                            .collect(Collectors.toList())) ;
+
+
+                    List<ContratSoutraitanceResponseDto> start = contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndProjectManagerAndCurrentStep_UserRole(user,UserRole.PROJECT_MANAGER).stream()
                             .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
                             .collect(Collectors.toList());
 
-                    return ResponseEntity.status(200).body(divisionDTOList);
+                    divisionDTOList.addAll(start);
+
+                    List<ContratSoutraitanceResponseDto> mergedContracts = new ArrayList<>(divisionDTOList);
+                    return ResponseEntity.status(200).body(mergedContracts);
+
                 } else {
                     // For CG, DAF, or DG roles, rely on the user's role only
 
-                    List<ContratSoutraitanceResponseDto> divisionDTOList = contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndCurrentStep_UserRole(user.getRole()).stream()
+                    List<ContratSoutraitanceResponseDto> divisionDTOList = contratSoustraitanceRepo.findAll().stream()
                             .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
                             .collect(Collectors.toList());
                     return ResponseEntity.status(200).body(divisionDTOList);
@@ -144,10 +156,13 @@ public class ContratService implements IcontratService {
             Business business =  businessRepository.findById(contrat.getBusinessID()).orElseThrow(()->new ResourceNotFoundException("Business ","getBusiness",""+contrat.getBusinessID()));
             Soustraitant soustraitant =  sousTraitantRepo.findById(contrat.getSoustraitantID()).orElseThrow(()->new ResourceNotFoundException("soustraitant ","traitant id",""+contrat.getSoustraitantID()));
             Division division =  divisionRepository.findById(contrat.getDivisionID()).orElseThrow(()->new ResourceNotFoundException("division","division id ",""+contrat.getDivisionID()));
+            User projectManager =  userRepository.findById(contrat.getProjectManagerID()).orElseThrow(()->new ResourceNotFoundException("projectManager","projectManagerID",""+contrat.getProjectManagerID()));
+
             Step step =  stepRepository.findById(1L).orElseThrow(()->new ResourceNotFoundException("step","step id ","1"));
 
             ContratSousTraitance contratSousTraitance = objectMapper.convertValue(contrat,ContratSousTraitance.class);
             contratSousTraitance.setBusiness(business);
+            contratSousTraitance.setProjectManager(projectManager);
             contratSousTraitance.setSoustraitant(soustraitant);
             contratSousTraitance.setDivision(division);
             contratSousTraitance.setCurrentStep(step);
@@ -246,7 +261,7 @@ public class ContratService implements IcontratService {
 //
 //    }
 
-
+//todo  old version
 
     @Override
     public List<ContratSoutraitanceResponseDto> getContractsByUserRoleAndDivision() {
@@ -263,38 +278,66 @@ public class ContratService implements IcontratService {
         if (userRole != null) {
             if (userRole == UserRole.DIVISION_MANAGER || userRole == UserRole.PROJECT_MANAGER) {
 
-                List<ContratSoutraitanceResponseDto> divisionDTOList = contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRole(user.getDivision(),userRole).stream()
+                Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRoleAndProjectManager(user.getDivision(),userRole,user).stream()
+                        .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
+                        .collect(Collectors.toList()));
+
+                List<ContratSoutraitanceResponseDto> start = contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndProjectManagerAndCurrentStep_UserRole(user,UserRole.PROJECT_MANAGER).stream()
                         .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
                         .collect(Collectors.toList());
+                divisionDTOList.addAll(start);
 
-                return divisionDTOList;
+                List<ContratSoutraitanceResponseDto> mergedContracts = new ArrayList<>(divisionDTOList);
+
+                return mergedContracts;
             } else if (userRole == UserRole.DP) {
                 // Query contracts by user's role and division for DP role
                 Pole p = user.getPole();
 
-                List<ContratSoutraitanceResponseDto> divisionDTOList = contratSoustraitanceRepo.findInvalidContratByPole(p.getPoleID()).stream()
+                Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findInvalidContratByPole(p.getPoleID()).stream()
+                        .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
+                        .collect(Collectors.toList())) ;
+
+
+                List<ContratSoutraitanceResponseDto> start = contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndProjectManagerAndCurrentStep_UserRole(user,UserRole.PROJECT_MANAGER).stream()
                         .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
                         .collect(Collectors.toList());
 
-                return divisionDTOList;
+                divisionDTOList.addAll(start);
+
+                List<ContratSoutraitanceResponseDto> mergedContracts = new ArrayList<>(divisionDTOList);
+
+                return mergedContracts;
             } else {
                 // For CG, DAF, or DG roles, rely on the user's role only
 
-                List<ContratSoutraitanceResponseDto> divisionDTOList = contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndCurrentStep_UserRole(userRole).stream()
+                Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndCurrentStep_UserRole(userRole).stream()
+                        .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
+                        .collect(Collectors.toList())) ;
+
+
+                List<ContratSoutraitanceResponseDto> start = contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndProjectManagerAndCurrentStep_UserRole(user,UserRole.PROJECT_MANAGER).stream()
                         .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
                         .collect(Collectors.toList());
-                return divisionDTOList;
+                divisionDTOList.addAll(start);
+                List<ContratSoutraitanceResponseDto> mergedContracts = new ArrayList<>(divisionDTOList);
+
+                return mergedContracts;
             }
         }
 
         return Collections.emptyList(); // Handle scenario where user role is null
     }
 
+//todo  old version
 
 
 
 
-       @Override
+
+
+
+    @Override
         public List<ContratSoutraitanceResponseDto> getContractsByUserRoleAndDivisionAilleur() {
 
            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

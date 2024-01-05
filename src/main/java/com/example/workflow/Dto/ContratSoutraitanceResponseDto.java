@@ -1,6 +1,7 @@
 package com.example.workflow.Dto;
 
 import com.example.workflow.Entities.*;
+import com.example.workflow.Entities.User.User;
 import com.example.workflow.Enums.TypeContrat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.EnumType;
@@ -32,6 +33,8 @@ public class ContratSoutraitanceResponseDto {
     private boolean valid;
     private List<Document> uploadedFiles;
 
+
+    private User projectManager;
 
     @JsonIgnoreProperties({"contratSousTraitances","division"})
     private Business business;

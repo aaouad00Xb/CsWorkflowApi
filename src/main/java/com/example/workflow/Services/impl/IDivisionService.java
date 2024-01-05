@@ -15,6 +15,8 @@ public interface IDivisionService {
 
 //    ResponseEntity<?> createDivision(Division division);
 
+    Division findInternDivisionById(Long id);
+
     ResponseEntity<?> createDivision(DivisioncreationDto division);
 
 //    ResponseEntity<?> updateDivision(Long id, Division updatedDivision);

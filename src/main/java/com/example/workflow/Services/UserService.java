@@ -2,12 +2,14 @@ package com.example.workflow.Services;
 
 import com.example.workflow.Dto.UserDtoResp;
 import com.example.workflow.Dto.UserEditDto;
+import com.example.workflow.Entities.ContratSousTraitance;
 import com.example.workflow.Entities.Division;
 import com.example.workflow.Entities.Pole;
 import com.example.workflow.Entities.User.User;
 import com.example.workflow.Entities.User.UserRole;
 import com.example.workflow.Repositories.UserRepository;
 import com.example.workflow.Services.impl.IUserService;
+import com.example.workflow.Services.impl.IcontratService;
 import com.example.workflow.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,11 +27,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserService implements IUserService {
     private final UserRepository userRepository;
+    private final DivisionService divisionService;
         private final ObjectMapper objectMapper;
 
     @Autowired
-    public UserService(UserRepository userRepository, ObjectMapper objectMapper) {
+    public UserService(UserRepository userRepository, DivisionService divisionService, ObjectMapper objectMapper) {
         this.userRepository = userRepository;
+        this.divisionService = divisionService;
         this.objectMapper = objectMapper;
     }
 
@@ -97,6 +102,43 @@ public class UserService implements IUserService {
                     return converted;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDtoResp> getchefsByDivisionID(Long divisionID) {
+        log.info("getting users");
+        Division d =   divisionService.findInternDivisionById(divisionID);
+        List<UserDtoResp> DP = this.findByDivisionAndRole(d, UserRole.DP);
+        List<User> projectsManager = this.userRepository.findByRoleAndDivision_DivisionId(UserRole.PROJECT_MANAGER,divisionID);
+        List<User> divisionsManagers = this.userRepository.findByRoleAndDivision_DivisionId(UserRole.DIVISION_MANAGER,divisionID);
+        List<User> directeursPole =  DP.stream()
+                .map(user -> {
+                    return  objectMapper.convertValue(user, User.class);
+
+                })
+                .collect(Collectors.toList());
+        List<User>cg = this.userRepository.findByRole(UserRole.CG);
+        List<User>dg = this.userRepository.findByRole(UserRole.DG);
+        List<User>daf = this.userRepository.findByRole(UserRole.DAF);
+
+        List<User> allUsers = new ArrayList<>();
+        allUsers.addAll(projectsManager);
+        allUsers.addAll(divisionsManagers);
+        allUsers.addAll(directeursPole);
+        allUsers.addAll(cg);
+        allUsers.addAll(dg);
+        allUsers.addAll(daf);
+
+        // Map User entities to UserDTOs using ObjectMapper
+        return allUsers.stream()
+                .map(user -> {
+                    UserDtoResp converted =  objectMapper.convertValue(user, UserDtoResp.class);
+                    converted.setPole(user.getPole());
+                    return converted;
+                })
+                .collect(Collectors.toList());
+
+
     }
 
 

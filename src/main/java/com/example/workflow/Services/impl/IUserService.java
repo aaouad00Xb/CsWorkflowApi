@@ -1,6 +1,5 @@
 package com.example.workflow.Services.impl;
 
-import com.example.workflow.Dto.UserDto;
 import com.example.workflow.Dto.UserDtoResp;
 import com.example.workflow.Dto.UserEditDto;
 import com.example.workflow.Entities.Division;
@@ -25,6 +24,8 @@ public interface IUserService {
 
     ResponseEntity<?> getUserById(Long userId);
     List<UserDtoResp> getUsers();
+
+    List<UserDtoResp> getchefsByDivisionID(Long divisionID);
 
     boolean toggleUserActiveStatus(Long userId);
 
