@@ -22,6 +22,14 @@ public interface ContratSoustraitanceRepo  extends JpaRepository<ContratSousTrai
     @Query("SELECT f FROM ContratSousTraitance f WHERE f.division.pole.poleID = :poleID AND f.valid = false AND f.currentStep.userRole = 'DP' ")
     List<ContratSousTraitance> findInvalidContratByPole(@Param("poleID") Long poleID);
 
+
+
+    @Query("SELECT f FROM ContratSousTraitance f WHERE f.valid = false")
+    List<ContratSousTraitance> findInvalidContrat();
+
+    @Query("SELECT f FROM ContratSousTraitance f WHERE f.division.pole.poleID = :poleID  ")
+    List<ContratSousTraitance> findContratByPole(@Param("poleID") Long poleID);
+
     @Query("SELECT f FROM ContratSousTraitance f WHERE f.division.pole.poleID = :poleID AND f.valid = false AND f.currentStep.userRole != 'DP' ")
     List<ContratSousTraitance> findInvalidContratByPoleAilleur(@Param("poleID") Long poleID);
 
@@ -29,7 +37,8 @@ public interface ContratSoustraitanceRepo  extends JpaRepository<ContratSousTrai
     List<ContratSousTraitance> findInvalidContratByPoleAilleurValid(@Param("poleID") Long poleID);
 
 
-    List<ContratSousTraitance> findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRoleAndProjectManager(Division d , UserRole r,User uer);
+    List<ContratSousTraitance> findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRole(Division d , UserRole r);
+    List<ContratSousTraitance> findContratSousTraitancesByValidIsFalseAndDivision(Division d );
     List<ContratSousTraitance> findContratSousTraitancesByValidIsFalseAndProjectManagerAndCurrentStep_UserRole(User r, UserRole ole);
     List<ContratSousTraitance> findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRoleIsNot(Division d, UserRole r);
     List<ContratSousTraitance> findContratSousTraitancesByValidIsTrueAndDivision(Division d);

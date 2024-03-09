@@ -48,6 +48,8 @@ public class ContratSoutraitanceResponseDto {
     private Step currentStep;  // The current step for the facture
 
 
+    @JsonIgnoreProperties({"facture","step","type"})
+    private ContratStepEntryDate contratStepEntryDate;
 
 
     private LocalDateTime createdAt;

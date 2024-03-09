@@ -19,9 +19,13 @@ public class Business extends  BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long businessID;
+    @Column(columnDefinition = "Text")
     private String objet;
+    @Column(columnDefinition = "Text")
     private String codeAffaire;
+    @Column(columnDefinition = "Text")
     private String mo;
+    @Column(columnDefinition = "Text")
     private String contactPerson;
     private String contactEmail;
     private String contactPhone;

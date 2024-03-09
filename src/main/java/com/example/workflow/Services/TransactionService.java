@@ -3,7 +3,7 @@ package com.example.workflow.Services;
 import com.example.workflow.Entities.*;
 import com.example.workflow.Enums.TransactionType;
 import com.example.workflow.Repositories.*;
-import com.example.workflow.Services.impl.ItransactionService;
+import com.example.workflow.Services.interfaces.ItransactionService;
 import com.example.workflow.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;

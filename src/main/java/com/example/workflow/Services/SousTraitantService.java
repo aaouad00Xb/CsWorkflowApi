@@ -1,12 +1,10 @@
 package com.example.workflow.Services;
 
-import com.example.workflow.Dto.Pole_creation_DTO;
 import com.example.workflow.Dto.ResponseDto;
 import com.example.workflow.Dto.SoustraitantCreationDto;
-import com.example.workflow.Entities.Pole;
 import com.example.workflow.Entities.Soustraitant;
 import com.example.workflow.Repositories.SousTraitantRepo;
-import com.example.workflow.Services.impl.IsoutraitantService;
+import com.example.workflow.Services.interfaces.IsoutraitantService;
 import com.example.workflow.constants.AccountsConstants;
 import com.example.workflow.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -18,6 +18,7 @@ public class Soustraitant extends  BaseEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
     private Long id;
+    @Column(columnDefinition = "Text")
     private String name;
     private String rc;
     private String cin;

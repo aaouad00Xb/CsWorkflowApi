@@ -23,6 +23,7 @@ public class Pole extends  BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long poleID;
+    @Column(columnDefinition = "Text")
     private String poleName;
     private String abreviation;
 

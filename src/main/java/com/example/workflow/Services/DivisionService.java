@@ -7,7 +7,7 @@ import com.example.workflow.Entities.Division;
 import com.example.workflow.Entities.Pole;
 import com.example.workflow.Repositories.DivisionRepository;
 import com.example.workflow.Repositories.PoleRepository;
-import com.example.workflow.Services.impl.IDivisionService;
+import com.example.workflow.Services.interfaces.IDivisionService;
 import com.example.workflow.constants.AccountsConstants;
 import com.example.workflow.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;

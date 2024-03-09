@@ -51,7 +51,7 @@ public class User  extends BaseEntity implements UserDetails{
     private UserRole role;
 
 
-    @JsonIgnoreProperties({"businesses"})
+    @JsonIgnoreProperties({"businesses",})
     @ManyToOne
     private Division division; // The division to which the user belongs
 

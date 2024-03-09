@@ -6,7 +6,7 @@ import com.example.workflow.Entities.Step;
 import com.example.workflow.Entities.StepField_r;
 import com.example.workflow.Repositories.StepFieldRepository;
 import com.example.workflow.Repositories.StepRepository;
-import com.example.workflow.Services.impl.IstepService;
+import com.example.workflow.Services.interfaces.IstepService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

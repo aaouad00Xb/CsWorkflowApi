@@ -1,17 +1,12 @@
 package com.example.workflow.Controllers;
 
 import com.example.workflow.Dto.Pole_creation_DTO;
-import com.example.workflow.Entities.Pole;
-import com.example.workflow.Services.PoleService;
-import com.example.workflow.Services.impl.IpoleService;
+import com.example.workflow.Services.interfaces.IpoleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/poles")

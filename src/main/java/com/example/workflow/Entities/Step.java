@@ -25,6 +25,7 @@ public class Step extends  BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long stepID;
+    @Column(columnDefinition = "Text")
     private String stepName;
     @Column(columnDefinition = "TEXT")
     private String stepDescription;

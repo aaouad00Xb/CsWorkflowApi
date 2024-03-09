@@ -63,6 +63,7 @@ public class SecurityConfiguration {
                         req
 //                                .requestMatchers(WHITE_LIST_URL).permitAll()
                                 .requestMatchers(antMatcher("/**")).permitAll()
+                                .requestMatchers(antMatcher("/Contrat/files/**")).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

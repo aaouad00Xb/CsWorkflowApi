@@ -12,9 +12,9 @@ public enum UserRole {
     DP("Directeur de Pôle"),
     DIVISION_MANAGER("Division Manager"),
     PROJECT_MANAGER("Project Manager"),
-//    Simple_Employee("Simple employee"),
-    ADMIN("Administrator");
-//    COMPTABILITE("comptabilite");
+    ADMIN("Administrator"),
+    ASSISTANTE_POLE("Assistante pole"),
+    COMPTABILITE("comptabilite");
     private String displayName;
 
 }

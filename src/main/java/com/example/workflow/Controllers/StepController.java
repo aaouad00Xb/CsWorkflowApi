@@ -3,10 +3,8 @@ package com.example.workflow.Controllers;
 import com.example.workflow.Dto.StepDTO;
 import com.example.workflow.Dto.StepResponseDto;
 import com.example.workflow.Entities.Step;
-import com.example.workflow.Services.StepService;
-import com.example.workflow.Services.impl.IstepService;
+import com.example.workflow.Services.interfaces.IstepService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

@@ -3,7 +3,8 @@ package com.example.workflow.Services;
 import com.example.workflow.Entities.User.User;
 import com.example.workflow.Entities.User.UserRole;
 import com.example.workflow.Repositories.UserRepository;
-import com.example.workflow.Services.impl.IEmailService;
+import com.example.workflow.Services.interfaces.IEmailService;
+import com.example.workflow.exception.ResourceNotFoundException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -74,6 +75,28 @@ public class EmailService implements IEmailService {
     }
 
 
+    public void sendSimpleMail(String body, String subject,String reciepient) {
+        // Create the verification link using the confirmation token
+        String verificationLink = "http://10.0.0.3:8080/SST_Suivi/";
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        User user = this.userRepository.findUserByUsername(reciepient).orElseThrow(()-> new ResourceNotFoundException("user","uername",""+reciepient));
+
+
+
+                    message.setTo(user.getEmail());
+                    message.setSubject(subject);
+                    message.setText(body +" "+ verificationLink);
+
+                    javaMailSender.send(message);
+
+            }
+        }
+
+
+
+
+
 //    public void sendComplementEmail(Long demandId,List<Complement> complements) {
 //        // Create the verification link using the confirmation token
 //        String verificationLink = "http://localhost:4200/login";
@@ -130,4 +153,3 @@ public class EmailService implements IEmailService {
 //
 //    }
 
-}

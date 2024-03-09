@@ -24,6 +24,7 @@ public class ContratSousTraitance extends  BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long contratID;
+    @Column(columnDefinition = "Text")
     private String contratNumber;
     private Date signatureDate;
     private double totalAmount;
@@ -37,7 +38,7 @@ public class ContratSousTraitance extends  BaseEntity {
     @ManyToOne
     private User projectManager;
 
-    @JsonIgnoreProperties({ "sousTraitances"})
+    @JsonIgnoreProperties({ "sousTraitances","createdAt","createdBy"})
     @ManyToOne
     private Business business;
 
@@ -62,11 +63,5 @@ public class ContratSousTraitance extends  BaseEntity {
 
     @ManyToOne()
     private Division division;
-
-//    @JsonIgnoreProperties({"username","email","manager","manager","division","myBuinesses"})
-//    @ManyToOne
-//    private User projectManager;  // The current step for the facture
-//
-//
 
 }

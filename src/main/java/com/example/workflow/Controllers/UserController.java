@@ -1,17 +1,14 @@
 package com.example.workflow.Controllers;
 
 import com.example.workflow.Dto.ResponseDto;
-import com.example.workflow.Dto.UserDto;
 import com.example.workflow.Dto.UserEditDto;
 import com.example.workflow.Entities.User.User;
 import com.example.workflow.Entities.User.UserRole;
-import com.example.workflow.Services.UserService;
-import com.example.workflow.Services.impl.IUserService;
+import com.example.workflow.Services.interfaces.IUserService;
 import com.example.workflow.constants.AccountsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

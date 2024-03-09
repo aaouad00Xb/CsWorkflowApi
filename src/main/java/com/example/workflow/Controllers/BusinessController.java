@@ -1,10 +1,8 @@
 package com.example.workflow.Controllers;
 
 import com.example.workflow.Dto.BuisnessCreationDto;
-import com.example.workflow.Dto.BusinessDTO;
 import com.example.workflow.Entities.Business;
-import com.example.workflow.Services.BusinessService;
-import com.example.workflow.Services.impl.IBuisinessService;
+import com.example.workflow.Services.interfaces.IBuisinessService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/businesses")

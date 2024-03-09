@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,5 +26,7 @@ public class DashboardDto {
     private double longestContractDuration;
     private double shortestContractDuration;
     private DashboardBarDto dashboardBarDto;
+    private List<EvolutionChartDto> populateEvolution;
+    private List<String> dates;
     private DashboardPoleBarDto dashboardPoleBarDto;
 }

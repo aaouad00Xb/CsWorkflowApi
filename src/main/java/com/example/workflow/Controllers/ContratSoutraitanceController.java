@@ -4,20 +4,33 @@ import com.example.workflow.Dto.ContratSoutraitanceCreationDto;
 import com.example.workflow.Entities.ContratSousTraitance;
 import com.example.workflow.Entities.Document;
 import com.example.workflow.Repositories.ContratSoustraitanceRepo;
-import com.example.workflow.Services.impl.IcontratService;
-import com.example.workflow.Services.impl.ItransactionService;
+import com.example.workflow.Services.FileService;
+import com.example.workflow.Services.FileStorageService;
+import com.example.workflow.Services.interfaces.IcontratService;
+import com.example.workflow.Services.interfaces.ItransactionService;
+import com.example.workflow.exception.ResourceNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -34,7 +47,13 @@ public class ContratSoutraitanceController {
     private IcontratService contratService;
 
     @Autowired
+    private FileService fileService;
+
+    @Autowired
     private ItransactionService transactionService;
+
+    @Autowired
+    private FileStorageService fileStorageService;
 
     @Autowired
     private ContratSoustraitanceRepo contratSoustraitanceRepo;
@@ -68,6 +87,22 @@ public class ContratSoutraitanceController {
 
         return ResponseEntity.ok(contratService.getContratBySousTraitance(id));
     }
+
+
+
+    @GetMapping("/All")
+    public ResponseEntity<?> getAllContrat() {
+
+        return ResponseEntity.ok(contratService.getContracts());
+    }
+
+
+    @GetMapping("/findAll")
+    public ResponseEntity<?> findAll() {
+
+        return ResponseEntity.ok(contratService.findAll());
+    }
+
 
 
       @GetMapping("/MesContrat")
@@ -126,6 +161,92 @@ public class ContratSoutraitanceController {
 
 
     }
+
+
+    @GetMapping("/files")
+    @ResponseBody
+    public ResponseEntity<Resource> downloadFile(@RequestParam("fileName") String fileName) throws IOException {
+        Resource file = fileService.download(fileName);
+        Path path = file.getFile()
+                .toPath();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, Files.probeContentType(path))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
+    }
+
+
+
+
+//    @GetMapping(value = "/images/{fileName}", produces = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+//    public ResponseEntity<?> getFileViaByteArrayResource(@PathVariable String fileName) throws IOException {
+//        System.out.println(fileName);
+//        return ResponseEntity.status(200).body(new Object());
+//
+//    }
+
+
+
+
+
+    /*HttpHeaders respHeaders = new HttpHeaders();
+    respHeaders.setContentLength(isr.length);
+    respHeaders.setContentType(new MediaType("text", "json"));
+    respHeaders.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+    respHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+    return new ResponseEntity<byte[]>(isr, respHeaders, HttpStatus.OK);*/
+
+
+
+
+//    @GetMapping(value = "/download-file",produces = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+//    public ResponseEntity<Resource> downloadFile(@RequestParam("fileName") String fileName, HttpServletRequest request) throws IOException {
+//        // Load file as Resource
+//
+//        System.out.println(fileName);
+//        Resource resource = fileStorageService.loadFileAsResource(fileName);
+//
+//        // Try to determine file's content type
+//        String contentType = null;
+//        try {
+//            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+//        } catch (IOException ex) {
+//            System.out.print("Could not determine file type.");
+//        }
+//
+//        // Fallback to the default content type if type could not be determined
+//        if(contentType == null) {
+//            contentType = "application/octet-stream";
+//        }
+//
+//        System.out.println("contentType");
+//        System.out.println(contentType);
+//        System.out.println("resource");
+//        System.out.println(resource);
+//        return ResponseEntity.ok()
+//                .contentType(MediaType.parseMediaType(contentType))
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+//                .body(resource);
+//    }
+
+//    @CrossOrigin(origins = "http://localhost:4200")
+//    @PostMapping(value = "/images/{fileName}", produces = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+//    public Resource getFileViaByteArrayResource(@PathVariable String fileName) throws IOException {
+//        // Construct the file path based on the file name
+//        System.out.println("acjraf");
+//        String filePath = "static/images/" + fileName;
+//
+//        // Read the file content as byte array
+//        Path path = Paths.get(filePath);
+//        byte[] fileContent = Files.readAllBytes(path);
+//
+//        // Create a ByteArrayResource from the file content
+//        ByteArrayResource resource = new ByteArrayResource(fileContent);
+//
+//        // Return the resource
+//        return resource;
+//    }
 
 
     @PostMapping("/uploadFileReparation/{contratID}")

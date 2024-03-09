@@ -23,11 +23,13 @@ public class Notification extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private NotificationType type;
     private String intitule;
+    @Column(columnDefinition = "Text")
     private String content;
     private String sended_by;
     private String receiver;
-    private Long contratID;
     private Date readAt;
+    private Long contratID;
+    private Long factureID;
     private boolean read;
     @Transient
     private boolean forMe;

@@ -22,6 +22,7 @@ public class Division extends  BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long divisionId;
+       @Column(columnDefinition = "Text")
         private String divisionName;
 
         private String abreviation;
@@ -38,7 +39,7 @@ public class Division extends  BaseEntity {
 //    private List<Business> businesses;
 
 
-        @JsonIgnoreProperties({"division","business"})
+        @JsonIgnoreProperties({"division","business","currentStep","createdAt"})
         @OneToMany(mappedBy = "division")
         private List<ContratSousTraitance> contratSousTraitances;
 

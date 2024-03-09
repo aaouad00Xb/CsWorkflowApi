@@ -4,9 +4,10 @@ import com.example.workflow.Dto.*;
 import com.example.workflow.Entities.*;
 import com.example.workflow.Entities.User.User;
 import com.example.workflow.Entities.User.UserRole;
+import com.example.workflow.Helpers.DateHelper;
 import com.example.workflow.Repositories.*;
-import com.example.workflow.Services.impl.IcontratService;
-import com.example.workflow.Services.impl.ItransactionService;
+import com.example.workflow.Services.interfaces.IcontratService;
+import com.example.workflow.Services.interfaces.ItransactionService;
 import com.example.workflow.constants.AccountsConstants;
 import com.example.workflow.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +28,10 @@ public class ContratService implements IcontratService {
 
     @Autowired
     private ContratSoustraitanceRepo contratSoustraitanceRepo;
+
+
+    @Autowired
+    private DateHelper dateHelper;
 
 
     @Autowired
@@ -79,7 +84,7 @@ public class ContratService implements IcontratService {
             if (user.getRole() != null) {
                 if (user.getRole() == UserRole.DIVISION_MANAGER || user.getRole() == UserRole.PROJECT_MANAGER) {
 
-                    Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRoleAndProjectManager(user.getDivision(),user.getRole(),user).stream()
+                    Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRole(user.getDivision(),user.getRole()).stream()
                             .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
                             .collect(Collectors.toList()));
 
@@ -278,7 +283,7 @@ public class ContratService implements IcontratService {
         if (userRole != null) {
             if (userRole == UserRole.DIVISION_MANAGER || userRole == UserRole.PROJECT_MANAGER) {
 
-                Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRoleAndProjectManager(user.getDivision(),userRole,user).stream()
+                Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndDivisionAndCurrentStep_UserRole(user.getDivision(),userRole).stream()
                         .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
                         .collect(Collectors.toList()));
 
@@ -288,6 +293,10 @@ public class ContratService implements IcontratService {
                 divisionDTOList.addAll(start);
 
                 List<ContratSoutraitanceResponseDto> mergedContracts = new ArrayList<>(divisionDTOList);
+
+                mergedContracts.stream().forEach(factureResponseDto -> {
+                    factureResponseDto.setContratStepEntryDate((ContratStepEntryDate) transactionService.getEntryDateByContratAndStep(factureResponseDto.getContratID(),factureResponseDto.getCurrentStep().getStepID()).getBody());
+                });
 
                 return mergedContracts;
             } else if (userRole == UserRole.DP) {
@@ -306,12 +315,91 @@ public class ContratService implements IcontratService {
                 divisionDTOList.addAll(start);
 
                 List<ContratSoutraitanceResponseDto> mergedContracts = new ArrayList<>(divisionDTOList);
+                 mergedContracts.stream().forEach(factureResponseDto -> {
+                    factureResponseDto.setContratStepEntryDate((ContratStepEntryDate) transactionService.getEntryDateByContratAndStep(factureResponseDto.getContratID(),factureResponseDto.getCurrentStep().getStepID()).getBody());
+                });
 
                 return mergedContracts;
             } else {
                 // For CG, DAF, or DG roles, rely on the user's role only
 
                 Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndCurrentStep_UserRole(userRole).stream()
+                        .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
+                        .collect(Collectors.toList())) ;
+
+
+                List<ContratSoutraitanceResponseDto> start = contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndProjectManagerAndCurrentStep_UserRole(user,UserRole.PROJECT_MANAGER).stream()
+                        .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
+                        .collect(Collectors.toList());
+                divisionDTOList.addAll(start);
+                List<ContratSoutraitanceResponseDto> mergedContracts = new ArrayList<>(divisionDTOList);
+                mergedContracts.stream().forEach(factureResponseDto -> {
+                    factureResponseDto.setContratStepEntryDate((ContratStepEntryDate) transactionService.getEntryDateByContratAndStep(factureResponseDto.getContratID(),factureResponseDto.getCurrentStep().getStepID()).getBody());
+                });
+
+                return mergedContracts;
+            }
+        }
+
+        return Collections.emptyList(); // Handle scenario where user role is null
+    }
+
+//todo  old version
+
+
+
+
+
+
+    @Override
+    public List<ContratSoutraitanceResponseDto> getContracts() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+
+        // Get the username or any other details about the authenticated user
+        String username = authentication.getName();
+
+        User user = userRepository.findUserByUsername(username).orElseThrow(()->new UsernameNotFoundException("user not found"));
+        UserRole userRole = user.getRole(); // Get user's role
+
+        if (userRole != null) {
+            if (userRole == UserRole.DIVISION_MANAGER || userRole == UserRole.PROJECT_MANAGER) {
+
+                Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndDivision(user.getDivision()).stream()
+                        .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
+                        .collect(Collectors.toList()));
+
+                List<ContratSoutraitanceResponseDto> start = contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndProjectManagerAndCurrentStep_UserRole(user,UserRole.PROJECT_MANAGER).stream()
+                        .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
+                        .collect(Collectors.toList());
+                divisionDTOList.addAll(start);
+
+                List<ContratSoutraitanceResponseDto> mergedContracts = new ArrayList<>(divisionDTOList);
+
+                return mergedContracts;
+            } else if (userRole == UserRole.DP) {
+                // Query contracts by user's role and division for DP role
+                Pole p = user.getPole();
+
+                Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findContratByPole(p.getPoleID()).stream()
+                        .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
+                        .collect(Collectors.toList())) ;
+
+
+                List<ContratSoutraitanceResponseDto> start = contratSoustraitanceRepo.findContratSousTraitancesByValidIsFalseAndProjectManagerAndCurrentStep_UserRole(user,UserRole.PROJECT_MANAGER).stream()
+                        .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
+                        .collect(Collectors.toList());
+
+                divisionDTOList.addAll(start);
+
+                List<ContratSoutraitanceResponseDto> mergedContracts = new ArrayList<>(divisionDTOList);
+
+                return mergedContracts;
+            } else {
+                // For CG, DAF, or DG roles, rely on the user's role only
+
+                Set<ContratSoutraitanceResponseDto> divisionDTOList = new HashSet<>(contratSoustraitanceRepo.findAll().stream()
                         .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
                         .collect(Collectors.toList())) ;
 
@@ -329,12 +417,14 @@ public class ContratService implements IcontratService {
         return Collections.emptyList(); // Handle scenario where user role is null
     }
 
-//todo  old version
+    @Override
+    public List<ContratSoutraitanceResponseDto> findAll() {
+        List<ContratSoutraitanceResponseDto> contratSoutraitanceResponseDtos = contratSoustraitanceRepo.findAll().stream()
+                .map(d -> objectMapper.convertValue(d, ContratSoutraitanceResponseDto.class))
+                .collect(Collectors.toList());
 
-
-
-
-
+        return contratSoutraitanceResponseDtos;
+    }
 
 
     @Override
@@ -436,6 +526,10 @@ public class ContratService implements IcontratService {
 
 
     // TODO: 26/12/2023
+
+
+
+
 
 
 
@@ -630,7 +724,6 @@ try{
         List<String> divisionNames = new ArrayList<>();
 
         for (Division division : divisions) {
-            System.out.println(division.getContratSousTraitances().size());
 
             List<ContratSousTraitance> contractsInDivision = division.getContratSousTraitances();
 
@@ -645,7 +738,7 @@ try{
 
 
                 // Logic for restarted contracts
-                if (hasRestartedEntryDays(entryDates)) {
+                if (hasretardEntryDays(entryDates)) {
                     restartedCount++;
                 }
 
@@ -695,7 +788,7 @@ try{
                     List<ContratStepEntryDate> entryDates = contratStepEntryDateRepository
                             .findByFactureEncoursOrderByEntryDateAsc(contrat);
 
-                    if (hasRestartedEntryDays(entryDates)) {
+                    if (hasretardEntryDays(entryDates)) {
                         restartedCount++;
                     }
 
@@ -720,23 +813,195 @@ try{
     }
 
 
-    private boolean hasRestartedEntryDays(List<ContratStepEntryDate> entryDates) {
+    private boolean hasretardEntryDays(List<ContratStepEntryDate> entryDates) {
         if (!entryDates.isEmpty()) {
             ContratStepEntryDate lastEntryDate = entryDates.get(entryDates.size() - 1);
             LocalDateTime today = LocalDateTime.now();
             LocalDateTime lastEntryDay = lastEntryDate.getEntryDate();
 
-            System.out.println("**********");
-            System.out.println(lastEntryDate);
-            System.out.println(today);
-            System.out.println(lastEntryDay);
-            System.out.println(ChronoUnit.DAYS.between(lastEntryDay, today) > 1);
-            System.out.println("**********");
-
             // Check if the difference between last entry day and today exceeds 1 day
             return ChronoUnit.DAYS.between(lastEntryDay, today) > 1;
         }
         return false;
+    }
+
+
+
+
+
+
+
+
+
+
+    @Override
+    public List<EvolutionChartDto> populateEvolution() {
+        List<Division> divisions = divisionRepository.findAll(); // Fetch all divisions
+
+        List<Integer> delayedContractsCount = new ArrayList<>();
+        List<Integer> validatedContractsCount = new ArrayList<>();
+        List<String> divisionNames = new ArrayList<>();
+
+        // Determine the start date and end date for the last three months
+
+        Double i = 0D;
+        Integer j = 6;
+
+        List <EvolutionChartDto> evolutionChartDto = new ArrayList<>();
+
+            for (Division division : divisions) {
+                EvolutionChartDto ev  = new EvolutionChartDto();
+                List<ContratSousTraitance> contractsInDivision = division.getContratSousTraitances();
+
+                ev.setType("line");
+                ev.setName(division.getDivisionName());
+
+                int validatedCount = 0;
+                while(j>=0){
+                    Double delayedCount = 0D;
+                    LocalDateTime startDate = LocalDateTime.now().minusMonths(j+1);
+                    LocalDateTime endDate =LocalDateTime.now().minusMonths(j);
+//                    printing the time between the dates
+
+                    System.out.format("start date %s / end date %s \n",startDate,endDate);
+
+                for (ContratSousTraitance contrat : contractsInDivision) {
+                    List<ContratStepEntryDate> entryDates = contratStepEntryDateRepository
+                            .findByFactureEncoursOrderByEntryDateAsc(contrat);
+
+
+                    ContratStepEntryDate preventryDates = contratStepEntryDateRepository.getLastEntryByContratIdBeforeDateTime(contrat.getContratID(),startDate);
+
+                    // Logic for delayed contracts within the last three months
+                    if (hasRetardEntryDaysWithinRange(entryDates, startDate, endDate)) {
+                        delayedCount = delayedCount + calculateretard(entryDates,startDate,endDate,preventryDates);
+                    }
+                }
+
+                // Add counts and division names to the lists
+
+                    ev.getData().add(delayedCount+i);
+                    i = delayedCount + i;
+
+                    j--;
+            }
+                evolutionChartDto.add(ev);
+        }
+
+
+        return evolutionChartDto;
+    }
+
+    // Method to check if a contract has delayed entry dates within the specified time range
+    private boolean hasRetardEntryDaysWithinRange(List<ContratStepEntryDate> entryDates, LocalDateTime startDate, LocalDateTime endDate) {
+        for (ContratStepEntryDate entryDate : entryDates) {
+            LocalDateTime entryDay = entryDate.getEntryDate();
+            // Check if the entry day falls within the specified time range
+            if (entryDay.isAfter(startDate) && entryDay.isBefore(endDate)) {
+                return true; // Contract has delayed entry within the specified time range
+            }
+        }
+        return false;
+    }
+
+
+
+    private int calculateretard(List<ContratStepEntryDate> entryDates, LocalDateTime startDate, LocalDateTime endDate,ContratStepEntryDate prev) {
+
+
+        //previous month
+
+//        LocalDateTime startDatePrev = startDate.minusMonths(1);
+//        LocalDateTime endDatePrev = startDate;
+//        List<ContratStepEntryDate> entrydates = new ArrayList<>();
+//        for (ContratStepEntryDate entryDate : entryDates) {
+//            LocalDateTime currentEntryDay = entryDate.getEntryDate();
+//
+//            if (currentEntryDay.isAfter(startDatePrev) && currentEntryDay.isBefore(endDatePrev)) {
+//
+//
+//            }
+//
+//
+//        }
+
+        int delaySum = 0;
+        LocalDateTime previousEntryDay = null;
+
+        if(prev!= null){
+            if(prev.getEntryDate()!= null){
+                previousEntryDay = prev.getEntryDate();
+            }
+        }
+
+
+        if(!entryDates.isEmpty()){
+            LocalDateTime currentEntryDay = null;
+
+
+            Optional<ContratStepEntryDate> firstMatchingEntry = entryDates.stream()
+                    .filter(entryDate -> entryDate.getEntryDate().isAfter(startDate) && entryDate.getEntryDate().isBefore(endDate))
+                    .findFirst();
+            if(firstMatchingEntry.isPresent()){
+                currentEntryDay = firstMatchingEntry.get().getEntryDate();
+            }
+
+            if (previousEntryDay != null  && currentEntryDay!= null) {
+                // Calculate the delay between consecutive entry days
+                long delayInHours = ChronoUnit.HOURS.between(previousEntryDay, currentEntryDay); //28
+                System.out.format("delay in hours %s \n",delayInHours);
+
+                // If the delay exceeds 24 hours, add it to the sum
+                if (delayInHours > 24) {
+                    System.out.format("upper 24 %s \n",delayInHours);
+                    delaySum += (int) (delayInHours); // Subtract 24 hours to account for the threshold
+                }else{
+                    System.out.format("under 24 %s \n",delayInHours);
+
+                    Long d =24 -  delayInHours;
+                    delaySum -= d;
+                }
+
+
+            }
+        }
+
+        previousEntryDay = null;
+
+        for (ContratStepEntryDate entryDate : entryDates) {
+
+
+            LocalDateTime currentEntryDay = entryDate.getEntryDate();
+
+            // Check if the entry day falls within the specified time range
+            if (currentEntryDay.isAfter(startDate) && currentEntryDay.isBefore(endDate)) {
+
+                if (previousEntryDay != null) {
+                    // Calculate the delay between consecutive entry days
+                    long delayInHours = ChronoUnit.HOURS.between(previousEntryDay, currentEntryDay); //28
+                    System.out.format("delay in hours %s \n",delayInHours);
+
+                    // If the delay exceeds 24 hours, add it to the sum
+                    if (delayInHours > 24) {
+                        System.out.format("upper 24 %s \n",delayInHours);
+                        delaySum += (int) (delayInHours - 24); // Subtract 24 hours to account for the threshold
+                    }else{
+                        System.out.format("under 24 %s \n",delayInHours);
+
+                        Long d =24 -  delayInHours;
+                        delaySum -= d;
+                    }
+
+
+                }
+
+                // Update previous entry day for the next iteration
+                previousEntryDay = currentEntryDay;
+
+            }
+        }
+        return delaySum;
+
     }
 
 

@@ -1,18 +1,12 @@
 package com.example.workflow.Controllers;
 
 import com.example.workflow.Dto.DivisioncreationDto;
-import com.example.workflow.Dto.Pole_creation_DTO;
-import com.example.workflow.Entities.Division;
-import com.example.workflow.Services.DivisionService;
-import com.example.workflow.Services.impl.IDivisionService;
+import com.example.workflow.Services.interfaces.IDivisionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/division")

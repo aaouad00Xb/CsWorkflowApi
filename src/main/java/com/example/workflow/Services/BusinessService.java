@@ -7,7 +7,7 @@ import com.example.workflow.Entities.Business;
 import com.example.workflow.Entities.Division;
 import com.example.workflow.Repositories.BusinessRepository;
 import com.example.workflow.Repositories.DivisionRepository;
-import com.example.workflow.Services.impl.IBuisinessService;
+import com.example.workflow.Services.interfaces.IBuisinessService;
 import com.example.workflow.constants.AccountsConstants;
 import com.example.workflow.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;

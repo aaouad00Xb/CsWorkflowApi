@@ -6,7 +6,7 @@ import com.example.workflow.Entities.ContratStepField;
 import com.example.workflow.Repositories.ContratSoustraitanceRepo;
 import com.example.workflow.Repositories.ContratStepFieldRepository;
 import com.example.workflow.Repositories.StepRepository;
-import com.example.workflow.Services.impl.IcontratStepFieldService;
+import com.example.workflow.Services.interfaces.IcontratStepFieldService;
 import com.example.workflow.constants.AccountsConstants;
 import com.example.workflow.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;

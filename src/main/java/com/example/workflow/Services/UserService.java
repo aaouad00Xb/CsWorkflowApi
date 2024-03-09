@@ -2,14 +2,12 @@ package com.example.workflow.Services;
 
 import com.example.workflow.Dto.UserDtoResp;
 import com.example.workflow.Dto.UserEditDto;
-import com.example.workflow.Entities.ContratSousTraitance;
 import com.example.workflow.Entities.Division;
 import com.example.workflow.Entities.Pole;
 import com.example.workflow.Entities.User.User;
 import com.example.workflow.Entities.User.UserRole;
 import com.example.workflow.Repositories.UserRepository;
-import com.example.workflow.Services.impl.IUserService;
-import com.example.workflow.Services.impl.IcontratService;
+import com.example.workflow.Services.interfaces.IUserService;
 import com.example.workflow.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -171,7 +169,6 @@ public class UserService implements IUserService {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     public ResponseEntity<?> getUserById(Long userID) {
 
@@ -187,6 +184,28 @@ public class UserService implements IUserService {
 
 
     }
+
+    @Override
+    public  List<UserDtoResp> getUserByRole(UserRole userRole) {
+
+
+        List<User> user =   this.userRepository.findByRole(userRole);
+        if (!user.isEmpty()){
+            List<UserDtoResp> userDtoResp = user.stream().map(
+                    u-> objectMapper.convertValue(u, UserDtoResp.class)
+            ).collect(Collectors.toList());
+
+
+
+
+            return userDtoResp;
+        }else{
+            throw new ResourceNotFoundException("user","userDtoResp",""+ userRole);
+        }
+
+
+    }
+
 
 
     @Override
